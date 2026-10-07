@@ -1,1 +1,26 @@
-export type Chunk={type:string;data:Uint8Array;crc:number};export function readChunk(input:Uint8Array):Chunk|null{if(input.length<12)return null;const length=(input[0]<<24)|(input[1]<<16)|(input[2]<<8)|input[3];if(length<0||input.length<12+length)return null;const type=new TextDecoder().decode(input.slice(4,8));return{type,data:input.slice(8,8+length),crc:0}}export function paeth(a:number,b:number,c:number){const p=a+b-c,pa=Math.abs(p-a),pb=Math.abs(p-b),pc=Math.abs(p-c);return pa<=pb&&pa<=pc?a:pb<=pc?b:c}
+export { StreamingPNGDecoder, paeth } from './decoder.js';
+export {
+  PNGDecodeError,
+  type DecodedRow,
+  type PNGColorType,
+  type PNGDecoderOptions,
+  type PNGErrorCode,
+  type PNGHeader,
+  type PNGImage,
+} from './types.js';
+
+import { StreamingPNGDecoder } from './decoder.js';
+import type { PNGDecoderOptions, PNGImage } from './types.js';
+
+/**
+ * Decode a complete PNG buffer in one call. Convenience wrapper around
+ * {@link StreamingPNGDecoder}.
+ */
+export function decodePNG(
+  data: Uint8Array,
+  options: PNGDecoderOptions = {},
+): Promise<PNGImage> {
+  const decoder = new StreamingPNGDecoder({ ...options, collect: true });
+  decoder.push(data);
+  return decoder.finish() as Promise<PNGImage>;
+}
