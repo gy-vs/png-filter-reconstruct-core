@@ -6,7 +6,7 @@
   "exports": "./dist/index.js",
   "scripts": {
     "build": "tsc -p tsconfig.json",
-    "test": "vitest run"
+    "test": "node --expose-gc ./node_modules/vitest/vitest.mjs run"
   },
   "devDependencies": {
     "@types/node": "^22.15.0",
